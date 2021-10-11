@@ -42,7 +42,7 @@ jobs:
           author_email: Jtrim777
           message: 'Update versioning info'
           push: true
-          tag: 'v'${{ env.NEW_VERSION }}' --force'
+          tag: 'v${{ env.NEW_VERSION }} --force'
 
 
       - name: Publish artifact
