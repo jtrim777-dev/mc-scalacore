@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Set new version var
-        run: echo "NEW_VERSION=$(echo $GITHUB_REF | cut -d "/" -f3)" >> $GITHUB_ENV
+        run: echo "NEW_VERSION=$(echo $GITHUB_REF | cut -d "/" -f3 | sed -E 's|v||g')" >> $GITHUB_ENV
 
       - name: Update versioning
         run: |
