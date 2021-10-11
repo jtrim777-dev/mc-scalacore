@@ -44,7 +44,7 @@ jobs:
           git add .
           git commit -m "Update versioning info"
           git tag --force 'v'$NEW_VERSION
-          git push -u origin master
+          git push -u github master
 
 
       - name: Publish artifact
