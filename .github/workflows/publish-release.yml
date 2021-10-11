@@ -37,6 +37,8 @@ jobs:
       - name: Commit version update
         run: |
           NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+          git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git pull github ${GITHUB_REF} --ff-only
           git config user.name "GitHub Actions"
           git config user.email "jtrimble777@gmeil.com"
           git add .
