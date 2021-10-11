@@ -19,7 +19,7 @@ class ScalaCore extends ModHeart {
     ForgeMod.enableMilkFluid()
   }
 
-  override def getContent: ContentManager = ???
+  override def getContent: ContentManager = CoreContent
 
   @SubscribeEvent
   def commonSetup(event: FMLCommonSetupEvent): Unit = {

@@ -26,6 +26,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Update versioning
+        run: |
+          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+          sed -E -e 's|mod_version=[0-9]+.[0-9]+.[0-9]+|mod_version='$NEW_VERSION'|g' -i "" build.properties
+          sed -E -e 's|final val Version: String = "[0-9]+.[0-9]+.[0-9]+"|final val Version: String = "'$NEW_VERSION'"|g' -i "" src/main/scala/com/github/jtrim777/scalacore/ScalaCore.scala
+          sed -E -e 's|"version" : "0.1.0"|"version" : "'$NEW_VERSION'"|g' -i "" src/main/resources/mcmod.info
+          sed -E -e 's|version="0.1.0" #mod|version="'$NEW_VERSION'" #mod|g' -i "" src/main/resources/META-INF/mods.toml
+
+      - name: Commit version update
+        uses: EndBug/add-and-commit@v7
+        env:
+          NEW_VERSION: $(echo "${GITHUB_REF}" | cut -d "/" -f3)
+        with:
+          author_name: GitHub Actions
+          author_email: Jtrim777
+          message: 'Update versioning info'
+          push: true
+          tag: 'v'${{NEW_VERSION}}' --force'
+
+
       - name: Publish artifact
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
