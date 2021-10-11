@@ -35,16 +35,14 @@ jobs:
           sed -E -e 's|version=".+" #mod|version="'$NEW_VERSION'" #mod|g' -i src/main/resources/META-INF/mods.toml
 
       - name: Commit version update
-        run: |
-          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
-          git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
-          git pull github ${GITHUB_REF} --ff-only
-          git config user.name "GitHub Actions"
-          git config user.email "jtrimble777@gmeil.com"
-          git add .
-          git commit -m "Update versioning info"
-          git tag --force 'v'$NEW_VERSION
-          git push -u github master
+        uses: EndBug/add-and-commit@v7
+        run: export NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+        with:
+          author_name: GitHub Actions
+          author_email: Jtrim777
+          message: 'Update versioning info'
+          push: true
+          tag: 'v'${{ env.NEW_VERSION }}' --force'
 
 
       - name: Publish artifact
