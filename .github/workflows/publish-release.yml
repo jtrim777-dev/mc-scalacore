@@ -26,9 +26,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Set new version var
+        run: echo "NEW_VERSION=$(echo $GITHUB_REF | cut -d "/" -f3)" >> $GITHUB_ENV
+
       - name: Update versioning
         run: |
-          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+          echo "Setting version references to $NEW_VERSION"
           sed -E -e 's|mod_version=.+|mod_version='$NEW_VERSION'|g' -i build.properties
           sed -E -e 's|final val Version: String = ".+"|final val Version: String = "'$NEW_VERSION'"|g' -i src/main/scala/com/github/jtrim777/scalacore/ScalaCore.scala
           sed -E -e 's|"version" : ".+"|"version" : "'$NEW_VERSION'"|g' -i src/main/resources/mcmod.info
@@ -36,7 +39,6 @@ jobs:
 
       - name: Commit version update
         uses: EndBug/add-and-commit@v7
-        run: export NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
         with:
           author_name: GitHub Actions
           author_email: Jtrim777
@@ -52,7 +54,6 @@ jobs:
         # The GITHUB_REF tag comes in the format 'refs/tags/xxx'.
         # So if we split on '/' and take the 3rd value, we can get the release name.
         run: |
-          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
           echo "New version: ${NEW_VERSION}"
           echo "Github username: ${GITHUB_ACTOR}"
           ./gradlew -Pversion=${NEW_VERSION} publish
