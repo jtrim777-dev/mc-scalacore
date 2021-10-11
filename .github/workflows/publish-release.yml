@@ -43,6 +43,8 @@ jobs:
           author_name: GitHub Actions
           author_email: Jtrim777
           message: 'Update versioning info'
+          branch: master
+          pull: 'NO-PULL'
           push: true
           tag: 'v${{ env.NEW_VERSION }} --force'
 
