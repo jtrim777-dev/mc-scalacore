@@ -1,17 +1,16 @@
 package com.github.jtrim777.scalacore.utils
 
-import scala.jdk.OptionConverters.RichOptional
 import scala.reflect.ClassTag
 
 import net.minecraft.core.BlockPos
 import net.minecraft.world.food.FoodProperties
-import net.minecraft.world.item.{BlockItem, CreativeModeTab, Item}
 import net.minecraft.world.item.Item.Properties
+import net.minecraft.world.item.{BlockItem, CreativeModeTab, Item}
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.eventbus.api.IEventBus
-import net.minecraftforge.registries.{DeferredRegister, IForgeRegistry, IForgeRegistryEntry, RegistryBuilder}
+import net.minecraftforge.registries._
 
 sealed trait ContentRegistrar[T <: IForgeRegistryEntry[T]] {
   val modid: String
@@ -23,8 +22,8 @@ sealed trait ContentRegistrar[T <: IForgeRegistryEntry[T]] {
 abstract class ComponentManager[T <: IForgeRegistryEntry[T]](val modid: String, registry: IForgeRegistry[T]) extends ContentRegistrar[T] {
   protected val entries: DeferredRegister[T] = DeferredRegister.create(registry, modid)
 
-  def entry(name: String, value: T): Option[T] = {
-    entries.register(name, () => value).map(i => i).toScala
+  def entry(name: String, value: T): RegistryObject[T] = {
+    entries.register(name, () => value)
   }
 
 //  def entry(loc: ResourceLocation, value: T): T =
@@ -41,8 +40,8 @@ abstract class CustomComponentManager[T <: IForgeRegistryEntry[T] : ClassTag](va
     .setType(clazz)
     .setName(name.rloc(modid)))
 
-  def entry(name: String, value: T): Option[T] = {
-    entries.register(name, () => value).map(i => i).toScala
+  def entry(name: String, value: T): RegistryObject[T] = {
+    entries.register(name, () => value)
   }
 
   //  def entry(loc: ResourceLocation, value: T): T =
@@ -54,14 +53,14 @@ abstract class CustomComponentManager[T <: IForgeRegistryEntry[T] : ClassTag](va
 
 object ComponentManager {
   implicit class ItemHelper(val icm: ComponentManager[Item]) {
-    private def item(name: String, group: CreativeModeTab): Option[Item] = icm.entry(name, new Item(new Properties().tab(group)))
+    def item(name: String, group: CreativeModeTab): RegistryObject[Item] = icm.entry(name, new Item(new Properties().tab(group)))
 
-    private def material(name: String): Option[Item] = item(name, CreativeModeTab.TAB_MATERIALS)
+    def material(name: String): RegistryObject[Item] = item(name, CreativeModeTab.TAB_MATERIALS)
 
-    private def blockItem(block: Block, group: CreativeModeTab): Option[Item] = icm.entry(block.getRegistryName.getPath,
+    def blockItem(block: Block, group: CreativeModeTab): RegistryObject[Item] = icm.entry(block.getRegistryName.getPath,
       new BlockItem(block, new Properties().tab(group)))
 
-    private def food(name: String, hunger: Int, sat: Float, fast: Boolean): Option[Item] = {
+    def food(name: String, hunger: Int, sat: Float, fast: Boolean): RegistryObject[Item] = {
       val foodProps = {
         val base = new FoodProperties.Builder().nutrition(hunger).saturationMod(sat)
         if (fast) {
@@ -75,7 +74,7 @@ object ComponentManager {
       icm.entry(name, new Item(itemProps))
     }
 
-    private def seed(name: String, plant: Block): Option[Item] =
+    def seed(name: String, plant: Block): RegistryObject[Item] =
       icm.entry(name, new BlockItem(plant, new Properties().tab(CreativeModeTab.TAB_MISC)))
 
 //    private def overrideBlockItem(block: Block, group: ItemGroup): Item =
