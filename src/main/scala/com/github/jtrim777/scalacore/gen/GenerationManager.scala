@@ -1,6 +1,6 @@
 package com.github.jtrim777.scalacore.gen
 
-import net.minecraft.client.renderer.model.ModelResourceLocation
+import net.minecraft.client.resources.model.ModelResourceLocation
 import net.minecraftforge.event.world.BiomeLoadingEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 
@@ -17,7 +17,7 @@ abstract class GenerationManager {
         val gen = event.getGeneration
         features
           .filter(_.appliesToBiome(location.getPath))
-          .foreach(f => gen.addFeature(f.stage, f.makeFeature))
+          .foreach(f => gen.addFeature(f.stage, f.placedFeature))
       case _ => // Do nothing
     }
   }

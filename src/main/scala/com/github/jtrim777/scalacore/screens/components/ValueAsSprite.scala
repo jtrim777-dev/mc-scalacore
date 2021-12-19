@@ -1,10 +1,11 @@
 package com.github.jtrim777.scalacore.screens.components
 
+import com.github.jtrim777.scalacore.menu.MenuDataProvider
 import com.github.jtrim777.scalacore.screens.{GraphicsContext, TextureBinding}
 import com.github.jtrim777.scalacore.tiles.TileBase
 
-class ValueAsSprite[TE <: TileBase] private(val binding: TextureBinding, extractor: TE => Float, direction: Int) extends ValueComponent[TE, Float](extractor) {
-  override def draw(graphics: GraphicsContext, tile: TE): Unit = direction match {
+class ValueAsSprite[D <: MenuDataProvider] private(val binding: TextureBinding, extractor: D => Float, direction: Int) extends ValueComponent[D, Float](extractor) {
+  override def draw(graphics: GraphicsContext, tile: D): Unit = direction match {
     case 0 =>
       val w = (binding.width.toFloat * extractor(tile)).toInt
       graphics.drawWithCutoff(binding, drawWidth = w)
@@ -20,17 +21,17 @@ class ValueAsSprite[TE <: TileBase] private(val binding: TextureBinding, extract
 
 object ValueAsSprite {
   case object Right {
-    def apply[TE <: TileBase](binding: TextureBinding, extractor: TE => Float): ValueAsSprite[TE] =
-      new ValueAsSprite[TE](binding, extractor, 0)
+    def apply[D <: MenuDataProvider](binding: TextureBinding, extractor: D => Float): ValueAsSprite[D] =
+      new ValueAsSprite[D](binding, extractor, 0)
   }
 
   case object Up {
-    def apply[TE <: TileBase](binding: TextureBinding, extractor: TE => Float): ValueAsSprite[TE] =
-      new ValueAsSprite[TE](binding, extractor, 3)
+    def apply[D <: MenuDataProvider](binding: TextureBinding, extractor: D => Float): ValueAsSprite[D] =
+      new ValueAsSprite[D](binding, extractor, 3)
   }
 
   case object Down {
-    def apply[TE <: TileBase](binding: TextureBinding, extractor: TE => Float): ValueAsSprite[TE] =
-      new ValueAsSprite[TE](binding, extractor, 1)
+    def apply[D <: MenuDataProvider](binding: TextureBinding, extractor: D => Float): ValueAsSprite[D] =
+      new ValueAsSprite[D](binding, extractor, 1)
   }
 }

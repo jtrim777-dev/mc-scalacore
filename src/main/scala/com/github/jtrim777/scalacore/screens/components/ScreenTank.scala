@@ -2,19 +2,21 @@ package com.github.jtrim777.scalacore.screens.components
 
 import com.github.jtrim777.scalacore.ScalaCore
 import com.github.jtrim777.scalacore.fluid.FluidTank
+import com.github.jtrim777.scalacore.menu.MenuDataProvider
 import com.github.jtrim777.scalacore.screens.{GraphicsContext, ScreenBounds}
 import com.github.jtrim777.scalacore.tiles.TileBase
 import com.github.jtrim777.scalacore.utils._
-import net.minecraft.fluid.Fluids
-import net.minecraft.inventory.container.PlayerContainer
-import net.minecraft.util.ResourceLocation
-import net.minecraft.util.text.{ITextComponent, StringTextComponent, TextFormatting}
+import net.minecraft.ChatFormatting
+import net.minecraft.client.renderer.texture.TextureAtlas
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.material.Fluids
 
-class ScreenTank[TE <: TileBase](x: Int, y: Int, extractor: TE => FluidTank) extends ValueComponent[TE, FluidTank](extractor) with TooltipComponent[TE] {
+class ScreenTank[D <: MenuDataProvider](x: Int, y: Int, extractor: D => FluidTank) extends ValueComponent[D, FluidTank](extractor) with TooltipComponent[D] {
 
   override val bounds: ScreenBounds = ScreenBounds(x, y, ScreenTank.TankWidth, ScreenTank.TankHeight)
 
-  override def draw(graphics: GraphicsContext, tile: TE): Unit = {
+  override def draw(graphics: GraphicsContext, tile: D): Unit = {
     val tank = extractor(tile)
     val fluid = tank.getFluid.getFluid
     val size: Float = tank.getFluidAmount.toFloat / tank.getCapacity.toFloat
@@ -23,30 +25,30 @@ class ScreenTank[TE <: TileBase](x: Int, y: Int, extractor: TE => FluidTank) ext
       val fluidSprite = graphics.getBlockSprite(fluid.getAttributes.getStillTexture)
 
       graphics.withColor(fluid.getAttributes.getColor) { () =>
-        graphics.withBinding(PlayerContainer.BLOCK_ATLAS) { () =>
+        graphics.withBinding(TextureAtlas.LOCATION_BLOCKS) { () =>
           graphics.drawTilesUp(x + 1, y + ScreenTank.TankHeight - 1, 16,
             (size * (ScreenTank.TankHeight - 2)).toInt, fluidSprite)
         }
       }
 
       graphics.withBinding(ScreenTank.OverlayTexture) { () =>
-        graphics.drawTexture(x, y, 0, 0, ScreenTank.TankWidth, ScreenTank.TankHeight, 101)
+        graphics.drawTexture(x, y, 0, 0, ScreenTank.TankWidth, ScreenTank.TankHeight)
       }
     }
   }
 
-  override def getTooltip(tile: TE): List[ITextComponent] = {
-    val tank = extractor(tile)
+  override def getTooltip(data: D): List[Component] = {
+    val tank = extractor(data)
 
     if (tank.isEmpty) {
       List(
         "Empty Tank".asUI,
-        s"Capacity: ${tank.getCapacity} mB".asUI.withStyle(TextFormatting.GRAY)
+        s"Capacity: ${tank.getCapacity} mB".asUI
       )
     } else {
       List(
         tank.getFluid.getDisplayName,
-        s"${tank.getFluidAmount}/${tank.getCapacity} mB".asUI.withStyle(TextFormatting.GRAY)
+        s"${tank.getFluidAmount}/${tank.getCapacity} mB".asUI.withStyle(ChatFormatting.GRAY)
       )
     }
   }

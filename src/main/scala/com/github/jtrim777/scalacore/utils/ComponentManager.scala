@@ -3,18 +3,13 @@ package com.github.jtrim777.scalacore.utils
 import scala.jdk.OptionConverters.RichOptional
 import scala.reflect.ClassTag
 
-import net.minecraft.block.Block
-import net.minecraft.entity.player.PlayerInventory
-import net.minecraft.inventory.container.{Container, ContainerType}
-import net.minecraft.item.Item.Properties
-import net.minecraft.item._
-import net.minecraft.item.crafting.{IRecipe, IRecipeSerializer, IRecipeType}
-import net.minecraft.network.PacketBuffer
-import net.minecraft.tileentity.{TileEntity, TileEntityType}
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.registry.Registry
-import net.minecraft.world.World
-import net.minecraftforge.common.extensions.IForgeContainerType
+import net.minecraft.core.BlockPos
+import net.minecraft.world.food.FoodProperties
+import net.minecraft.world.item.{BlockItem, CreativeModeTab, Item}
+import net.minecraft.world.item.Item.Properties
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.registries.{DeferredRegister, IForgeRegistry, IForgeRegistryEntry, RegistryBuilder}
 
@@ -58,30 +53,17 @@ abstract class CustomComponentManager[T <: IForgeRegistryEntry[T] : ClassTag](va
 }
 
 object ComponentManager {
-  type CMaker[T <: Container] = (Int, ContainerType[T], Block, World, BlockPos, PlayerInventory) => T
-
-  implicit class ContainerHelper(val ccm: ComponentManager[ContainerType[_]]) {
-    def container[T <: Container](name: String, kind: => ContainerType[T], source: Block,
-                                  maker: CMaker[T])(implicit world: World, MODID: String): Option[ContainerType[T]] = {
-      val value = IForgeContainerType.create((windowId: Int, inv: PlayerInventory, data: PacketBuffer) =>
-        maker(windowId, kind, source, world, data.readBlockPos(), inv)
-      )
-
-      ccm.entry(name, value).map(_.asInstanceOf[ContainerType[T]])
-    }
-  }
-
   implicit class ItemHelper(val icm: ComponentManager[Item]) {
-    private def item(name: String, group: ItemGroup): Option[Item] = icm.entry(name, new Item(new Properties().tab(group)))
+    private def item(name: String, group: CreativeModeTab): Option[Item] = icm.entry(name, new Item(new Properties().tab(group)))
 
-    private def material(name: String): Option[Item] = item(name, ItemGroup.TAB_MATERIALS)
+    private def material(name: String): Option[Item] = item(name, CreativeModeTab.TAB_MATERIALS)
 
-    private def blockItem(block: Block, group: ItemGroup): Option[Item] = icm.entry(block.getRegistryName.getPath,
+    private def blockItem(block: Block, group: CreativeModeTab): Option[Item] = icm.entry(block.getRegistryName.getPath,
       new BlockItem(block, new Properties().tab(group)))
 
     private def food(name: String, hunger: Int, sat: Float, fast: Boolean): Option[Item] = {
       val foodProps = {
-        val base = new Food.Builder().nutrition(hunger).saturationMod(sat)
+        val base = new FoodProperties.Builder().nutrition(hunger).saturationMod(sat)
         if (fast) {
           base.fast()
         } else {
@@ -89,29 +71,21 @@ object ComponentManager {
         }
       }
 
-      val itemProps = new Properties().tab(ItemGroup.TAB_FOOD).food(foodProps.build)
+      val itemProps = new Properties().tab(CreativeModeTab.TAB_FOOD).food(foodProps.build)
       icm.entry(name, new Item(itemProps))
     }
 
     private def seed(name: String, plant: Block): Option[Item] =
-      icm.entry(name, new BlockNamedItem(plant, new Item.Properties().tab(ItemGroup.TAB_MISC)))
+      icm.entry(name, new BlockItem(plant, new Properties().tab(CreativeModeTab.TAB_MISC)))
 
 //    private def overrideBlockItem(block: Block, group: ItemGroup): Item =
 //      new BlockItem(block, new Item.Properties().tab(group))
 //        .setRegistryName("minecraft", block.getRegistryName.getPath)
   }
 
-  implicit class RecipeHelper(val rcm: ComponentManager[IRecipeSerializer[_]]) {
-    private def registerType[T <: IRecipe[_]](name: String)(implicit modid: String): IRecipeType[T] = {
-      Registry.register(Registry.RECIPE_TYPE, name.rloc, new IRecipeType[T] {
-        override def toString: String = name
-      })
-    }
-  }
-
-  implicit class TileHelper(val tcm: ComponentManager[TileEntityType[_]]) {
-    def tileEntity[T <: TileEntity](name: String, tileMaker: () => T, parentBlocks: Block*): TileEntityType[_ <: TileEntity] = {
-      val t = TileEntityType.Builder.of(() => tileMaker(), parentBlocks:_*).build(null)
+  implicit class TileHelper(val tcm: ComponentManager[BlockEntityType[_]]) {
+    def tileEntity[T <: BlockEntity](name: String, tileMaker: (BlockPos, BlockState) => T, parentBlocks: Block*): BlockEntityType[_ <: BlockEntity] = {
+      val t = BlockEntityType.Builder.of((pos, state) => tileMaker(pos, state), parentBlocks:_*).build(null)
       t.setRegistryName(name)
       t
     }

@@ -2,7 +2,7 @@ package com.github.jtrim777.scalacore.tiles
 
 import com.github.jtrim777.scalacore.capabilities.FluidHandler
 import com.github.jtrim777.scalacore.fluid.FluidTank
-import net.minecraft.util.Direction
+import net.minecraft.core.Direction
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
@@ -19,5 +19,16 @@ trait FluidHandlingTile extends TileBase {
     } else {
       super.getCapability(cap, side)
     }
+  }
+
+
+  override def clearContent(): Unit = {
+    fluidInventory.clear()
+    super.clearContent()
+  }
+
+  override def invalidateCaps(): Unit = {
+    super.invalidateCaps()
+    fiHolder.invalidate()
   }
 }

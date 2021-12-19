@@ -1,25 +1,22 @@
 package com.github.jtrim777.scalacore
 
-import java.util.function.Supplier
 import scala.jdk.OptionConverters.RichOptional
 
-import net.minecraft.fluid.Fluid
-import net.minecraft.item.{Item, ItemStack, Items}
-import net.minecraft.util.ResourceLocation
-import net.minecraft.util.text.{StringTextComponent, TranslationTextComponent}
+import net.minecraft.network.chat.{TextComponent, TranslatableComponent}
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.{Item, ItemStack, Items}
+import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.common.capabilities.{Capability, CapabilityProvider}
 import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fml.RegistryObject
-import net.minecraftforge.registries.DeferredRegister
 
 package object utils {
 
   implicit class StrExt(str: String) {
     def rloc(implicit modid: String): ResourceLocation = new ResourceLocation(modid, str)
 
-    def translate: TranslationTextComponent = new TranslationTextComponent(str)
+    def translate: TranslatableComponent = new TranslatableComponent(str)
 
-    def asUI: StringTextComponent = new StringTextComponent(str)
+    def asUI: TextComponent = new TextComponent(str)
   }
 
   implicit class FluidExt(fluid: Fluid) {

@@ -4,11 +4,13 @@ import com.github.jtrim777.scalacore.fluid.FluidTank
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import com.github.jtrim777.scalacore.utils._
-import net.minecraft.nbt.{CompoundNBT, ListNBT}
+import net.minecraft.nbt.{CompoundTag, ListTag}
 import scala.jdk.CollectionConverters._
 
 class FluidHandler(stanks: List[FluidTank] = List.empty) extends IFluidHandler {
   var tanks: List[FluidTank] = List(stanks:_*)
+
+  def clear(): Unit = tanks.foreach { tank => tank.setFluid(FluidStack.EMPTY) }
 
   override def getTanks: Int = tanks.length
 
@@ -86,19 +88,19 @@ class FluidHandler(stanks: List[FluidTank] = List.empty) extends IFluidHandler {
   def drainTank(tank: Int, amt: Int)(simulate: Boolean): FluidStack =
     drainTank(tank, amt, if (simulate) IFluidHandler.FluidAction.SIMULATE else IFluidHandler.FluidAction.EXECUTE)
 
-  def deserializeNBT(tag: ListNBT): Unit = {
+  def deserializeNBT(tag: ListTag): Unit = {
     tag.asScala.zipWithIndex.foreach { case (elem, i) =>
-      val stack = elem.asInstanceOf[CompoundNBT]
+      val stack = elem.asInstanceOf[CompoundTag]
 
       tanks(i).setFluid(FluidStack.loadFluidStackFromNBT(stack))
     }
   }
 
-  def serializeNBT: ListNBT = {
-    val tag = new ListNBT()
+  def serializeNBT: ListTag = {
+    val tag = new ListTag()
 
     tanks.foreach { tank =>
-      tag.add(tank.writeToNBT(new CompoundNBT()))
+      tag.add(tank.writeToNBT(new CompoundTag()))
     }
 
     tag

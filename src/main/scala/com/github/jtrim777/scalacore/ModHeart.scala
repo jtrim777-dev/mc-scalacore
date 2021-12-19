@@ -5,7 +5,6 @@ import com.github.jtrim777.scalacore.utils.ContentManager
 import net.minecraftforge.eventbus.api.{IEventBus, SubscribeEvent}
 import net.minecraftforge.fml.DistExecutor
 import net.minecraftforge.fml.event.lifecycle.{FMLCommonSetupEvent, FMLDedicatedServerSetupEvent}
-import net.minecraftforge.fml.event.server.{FMLServerAboutToStartEvent, FMLServerStartedEvent, FMLServerStartingEvent}
 import net.minecraftforge.scorge.lang.ScorgeModLoadingContext
 import org.apache.logging.log4j.{LogManager, Logger}
 
@@ -47,13 +46,4 @@ trait ModHeart {
 
   @SubscribeEvent
   def serverSetup(event: FMLDedicatedServerSetupEvent): Unit
-
-  @SubscribeEvent
-  def serverWillStart(event: FMLServerAboutToStartEvent): Unit
-
-  @SubscribeEvent
-  def serverStarting(event: FMLServerStartingEvent): Unit
-
-  @SubscribeEvent
-  def serverStarted(event: FMLServerStartedEvent): Unit
 }

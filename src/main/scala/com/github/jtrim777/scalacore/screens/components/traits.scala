@@ -1,11 +1,11 @@
 package com.github.jtrim777.scalacore.screens.components
 
-import com.github.jtrim777.scalacore.tiles.TileBase
-import com.github.jtrim777.scalacore.screens.{GraphicsContext, Screen, ScreenBounds}
-import net.minecraft.util.text.ITextComponent
+import com.github.jtrim777.scalacore.menu.MenuDataProvider
+import com.github.jtrim777.scalacore.screens.{GraphicsContext, ScreenBounds}
+import net.minecraft.network.chat.Component
 
-trait ScreenDrawable[TE <: TileBase] {
-  def draw(graphics: GraphicsContext, tile: TE): Unit
+trait ScreenDrawable[D <: MenuDataProvider] {
+  def draw(graphics: GraphicsContext, data: D): Unit
 }
 
 trait BoundedComponent {
@@ -13,8 +13,8 @@ trait BoundedComponent {
   def isInside(mx:Int, my:Int): Boolean = bounds.contains(mx,my)
 }
 
-trait TooltipComponent[TE] extends BoundedComponent {
-  def getTooltip(tile: TE): List[ITextComponent]
+trait TooltipComponent[D <: MenuDataProvider] extends BoundedComponent {
+  def getTooltip(data: D): List[Component]
 }
 
 trait ScreenInteractable extends BoundedComponent {

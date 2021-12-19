@@ -1,16 +1,15 @@
 package com.github.jtrim777.scalacore.setup
 
-import com.github.jtrim777.scalacore.screens.CoreScreens
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.world.World
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
 
 sealed trait ModProxy {
   def init(): Unit
 
-  def getClientWorld: World
+  def getClientWorld: Level
 
-  def getClientPlayer: PlayerEntity
+  def getClientPlayer: Player
 
   def executeClient(f:() => Unit): Unit
   def executeServer(f:() => Unit): Unit
@@ -20,9 +19,9 @@ sealed trait ModProxy {
 }
 
 trait ClientProxy extends ModProxy {
-  override def getClientWorld: World = Minecraft.getInstance().level
+  override def getClientWorld: Level = Minecraft.getInstance().level
 
-  override def getClientPlayer: PlayerEntity = Minecraft.getInstance().player
+  override def getClientPlayer: Player = Minecraft.getInstance().player
 
   override def executeClient(f: () => Unit): Unit = f()
 
@@ -34,10 +33,10 @@ trait ClientProxy extends ModProxy {
 }
 
 trait ServerProxy extends ModProxy {
-  override def getClientWorld: World =
+  override def getClientWorld: Level =
     throw new IllegalStateException("This proxy code should only be called from the client side")
 
-  override def getClientPlayer: PlayerEntity =
+  override def getClientPlayer: Player =
     throw new IllegalStateException("This proxy code should only be called from the client side")
 
   override def executeClient(f: () => Unit): Unit = {}
@@ -54,8 +53,6 @@ private[scalacore] case class CoreClientProxy() extends ClientProxy {
 
   }
 }
-
-
 
 private[scalacore] case class CoreServerProxy() extends ServerProxy {
   override def init(): Unit = {

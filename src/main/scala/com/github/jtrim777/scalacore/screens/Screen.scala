@@ -1,58 +1,61 @@
 package com.github.jtrim777.scalacore.screens
 
-import com.mojang.blaze3d.matrix.MatrixStack
-import com.mojang.blaze3d.systems.RenderSystem
-import com.github.jtrim777.scalacore.containers.ContainerBase
-import com.github.jtrim777.scalacore.screens.components.{ScreenDrawable, TooltipComponent}
-import com.github.jtrim777.scalacore.tiles.TileBase
-import net.minecraft.client.gui.screen.inventory.ContainerScreen
-import net.minecraft.entity.player.PlayerInventory
-import net.minecraft.util.ResourceLocation
-import net.minecraft.util.text.ITextComponent
 import scala.jdk.CollectionConverters._
 
-abstract class Screen[C <: ContainerBase, T <: TileBase](container: C,
-                                                         playerInv: PlayerInventory,
-                                                         name: ITextComponent) extends ContainerScreen[C](container, playerInv, name) {
+import com.github.jtrim777.scalacore.menu.{MenuBase, MenuDataProvider}
+import com.github.jtrim777.scalacore.screens.components.{ScreenDrawable, TooltipComponent}
+import com.github.jtrim777.scalacore.tiles.TileBase
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.renderer.GameRenderer
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.player.Inventory
 
-  val tileEntity: T = container.tileEntity.asInstanceOf[T]
+abstract class Screen[D <: MenuDataProvider, C <: MenuBase[D], T <: TileBase](menu: C, playerInv: Inventory, name: Component)
+  extends AbstractContainerScreen[C](menu, playerInv, name) {
+
   val textureLocation: ResourceLocation
 
-  var components: List[ScreenDrawable[T]] = List.empty
+  var components: List[ScreenDrawable[D]] = List.empty
 
   override def init(): Unit = {
     super.init()
   }
 
-  protected def addComponent(comp: ScreenDrawable[T]): Unit = components = components :+ comp
+  protected def addComponent(comp: ScreenDrawable[D]): Unit = components = components :+ comp
 
   protected def layoutComponents(): Unit
 
-  override def render(matrix: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
+  override def render(matrix: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
     this.renderBackground(matrix)
     super.render(matrix, mouseX, mouseY, partialTicks)
 
     this.renderTooltip(matrix, mouseX, mouseY)
   }
 
-  override def renderBg(matrix: MatrixStack, partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F)
-    rebindGUITexture()
+  override def renderBg(matrix: PoseStack, partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
+    RenderSystem.setShader(() => GameRenderer.getPositionTexShader);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.setShaderTexture(0, this.textureLocation);
 
     val graphics = new GraphicsContext(this, leftPos, topPos, matrix)
 
     graphics.drawTexture(0, 0, 0, 0, imageWidth, imageHeight)
   }
 
-  override def renderTooltip(matrix: MatrixStack, mouseX: Int, mouseY : Int): Unit = {
+  override def renderTooltip(matrix: PoseStack, mouseX: Int, mouseY : Int): Unit = {
     super.renderTooltip(matrix, mouseX, mouseY)
 
-    components.filter(_.isInstanceOf[TooltipComponent[T]]).map(_.asInstanceOf[TooltipComponent[T]]) foreach { ttp =>
-      if (ttp.isInside(mouseX, mouseY)) {
-        this.renderComponentTooltip(matrix, ttp.getTooltip(tileEntity).asJava, mouseX, mouseY)
-      }
+    components foreach {
+      case ttp: TooltipComponent[D] =>
+        if (ttp.isInside(mouseX, mouseY)) {
+          this.renderComponentTooltip(matrix, ttp.getTooltip(menu.data).asJava, mouseX, mouseY)
+        }
+      case _ => ()
     }
   }
 
-  def rebindGUITexture(): Unit = this.minecraft.getTextureManager.bind(this.textureLocation)
+  def rebindGUITexture(): Unit = RenderSystem.setShaderTexture(0, this.textureLocation);
 }

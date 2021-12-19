@@ -1,13 +1,12 @@
 package com.github.jtrim777.scalacore.utils
 
-import io.circe.{Decoder, DecodingFailure, HCursor, Json}
 import scala.jdk.CollectionConverters._
 import scala.util.Try
 
-import io.circe.Decoder.Result
-import net.minecraft.fluid.Fluid
-import net.minecraft.item.{Item, ItemStack}
-import net.minecraft.util.ResourceLocation
+import io.circe.{Decoder, DecodingFailure, HCursor, Json}
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.{Item, ItemStack}
+import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 
 object JsonUtil {
