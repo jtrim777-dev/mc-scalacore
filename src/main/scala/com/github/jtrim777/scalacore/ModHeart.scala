@@ -5,7 +5,7 @@ import com.github.jtrim777.scalacore.utils.ContentManager
 import net.minecraftforge.eventbus.api.{IEventBus, SubscribeEvent}
 import net.minecraftforge.fml.DistExecutor
 import net.minecraftforge.fml.event.lifecycle.{FMLCommonSetupEvent, FMLDedicatedServerSetupEvent}
-import net.minecraftforge.scorge.lang.ScorgeModLoadingContext
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext
 import org.apache.logging.log4j.{LogManager, Logger}
 
 trait ModHeart {
@@ -23,7 +23,7 @@ trait ModHeart {
     () => () => getServerProxy.asInstanceOf[ModProxy]
   )
 
-  initialize(ScorgeModLoadingContext.get.getModEventBus)
+  initialize(FMLJavaModLoadingContext.get.getModEventBus)
 
   protected def initialize(bus: IEventBus): Unit = {
     log.info(s"Beginning mod initialization")
