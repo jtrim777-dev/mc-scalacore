@@ -21,7 +21,10 @@ abstract class TileBase(invSize: Int, kind: BlockEntityType[_], nameKey: String)
                        (pos: BlockPos, bstate: BlockState)
   extends BaseContainerBlockEntity(kind, pos, bstate) {
 
-  protected val slotLayout: InventoryLayout
+  /**
+   * The layout and item-validators for all items within this tile's inventor
+   */
+  val slotLayout: InventoryLayout
   protected val inventory: ItemHandler = ItemHandler(
     invSize,
     (i, stack) => slotLayout.validForSlot(i, stack)(inventory),
@@ -37,6 +40,10 @@ abstract class TileBase(invSize: Int, kind: BlockEntityType[_], nameKey: String)
     }
   }
 
+  /**
+   * Throw an item into the world
+   * @param stack The item stack to throw
+   */
   def ejectItem(stack: ItemStack): Unit =
     level.addFreshEntity(new ItemEntity(level, worldPosition.getX, worldPosition.getY, worldPosition.getZ, stack))
 
@@ -46,14 +53,27 @@ abstract class TileBase(invSize: Int, kind: BlockEntityType[_], nameKey: String)
     handleUpdateTag(pkt.getTag)
   }
 
+  /**
+   * Respond to changes in the block's inventory
+   */
   def inventoryUpdated(): Unit
 
+  /**
+   * Save tile data to NBT. Override whenever adding more data to the tile than the
+   * primary inventory
+   * @param tag The tag to add data to
+   */
   override def save(tag: CompoundTag): CompoundTag = {
     tag.put("primary_inventory", inventory.serializeNBT)
 
     super.save(tag)
   }
 
+  /**
+   * Load tile data from NBT. Override whenever adding more data to the tile than the
+   * primary inventory
+   * @param tag The tag to load from
+   */
   override def load(tag: CompoundTag): Unit = {
     inventory.deserializeNBT(tag.getCompound("primary_inventory"))
 
@@ -65,12 +85,28 @@ abstract class TileBase(invSize: Int, kind: BlockEntityType[_], nameKey: String)
     inventoryOptional.invalidate()
   }
 
+  /**
+   * @return The number of slots in this tile's primary inventory
+   */
   override def getContainerSize: Int = invSize
 
+  /**
+   * @return True if this tile's primary inventory is completely empty
+   */
   override def isEmpty: Boolean = inventory.isEmpty
 
+  /**
+   * View the item stack in a given slot index
+   * @param slot The index of the slot to view
+   */
   override def getItem(slot: Int): ItemStack = inventory.getStackInSlot(slot)
 
+  /**
+   * Remove an item(s) from this tile's primary inventory. The resulting stack will be smaller
+   * than or equal to the number of items requested for removal.
+   * @param slot The slot index to remove from
+   * @param count The number of items to remove
+   */
   override def removeItem(slot: Int, count: Int): ItemStack =
     inventory.extractItem(slot, count, simulate = false)
 

@@ -86,6 +86,7 @@ object ComponentManager {
     def tileEntity[T <: BlockEntity](name: String, tileMaker: (BlockPos, BlockState) => T, parentBlocks: Block*): BlockEntityType[_ <: BlockEntity] = {
       val t = BlockEntityType.Builder.of((pos, state) => tileMaker(pos, state), parentBlocks:_*).build(null)
       t.setRegistryName(name)
+      tcm.entry(name, t)
       t
     }
   }
