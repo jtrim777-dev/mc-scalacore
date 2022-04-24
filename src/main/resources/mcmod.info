@@ -2,7 +2,7 @@
   "modid" : "scalacore",
   "name" : "Scala Core",
   "description" : "Basis for TheSilverKing7's Scala Mods",
-  "version" : "0.1.5",
+  "version" : "0.2.0",
   "mcversion" : "1.18.1",
   "authorList" : ["TheSilverKing7"]
 }]
