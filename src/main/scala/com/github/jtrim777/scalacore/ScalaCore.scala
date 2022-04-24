@@ -33,5 +33,5 @@ class ScalaCore extends ModHeart {
 
 object ScalaCore {
   final val MODID: String = "scalacore"
-  final val Version: String = "0.1.4"
+  final val Version: String = "0.1.5"
 }
