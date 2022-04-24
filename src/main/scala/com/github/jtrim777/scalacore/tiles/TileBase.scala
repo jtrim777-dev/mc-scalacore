@@ -25,7 +25,7 @@ abstract class TileBase(invSize: Int, kind: BlockEntityType[_], nameKey: String)
    * The layout and item-validators for all items within this tile's inventor
    */
   val slotLayout: InventoryLayout
-  protected val inventory: ItemHandler = ItemHandler(
+  val inventory: ItemHandler = ItemHandler(
     invSize,
     (i, stack) => slotLayout.validForSlot(i, stack)(inventory),
     () => { setChanged(); inventoryUpdated() }
