@@ -1,8 +1,8 @@
 package com.github.jtrim777.scalacore.capabilities
 
 import com.github.jtrim777.scalacore.utils.CapProvExt
-import net.minecraft.item.{Item, ItemStack}
-import net.minecraft.util.Direction
+import net.minecraft.core.Direction
+import net.minecraft.world.item.{Item, ItemStack}
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
@@ -39,4 +39,5 @@ class EmptyFluidItemHandler(val capacity: Int, base: ItemStack, val fullItem: It
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] =
     CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY.orEmpty(cap, holder.cast())
+
 }

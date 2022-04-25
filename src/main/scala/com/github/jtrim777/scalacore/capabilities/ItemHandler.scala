@@ -1,15 +1,12 @@
 package com.github.jtrim777.scalacore.capabilities
 
-import com.github.jtrim777.scalacore.inventory.WrappedInventory
-import net.minecraft.inventory.IInventory
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.{CompoundNBT, ListNBT}
+import net.minecraft.nbt.{CompoundTag, ListTag}
+import net.minecraft.world.item.ItemStack
 import net.minecraftforge.common.util.INBTSerializable
 import net.minecraftforge.items.{IItemHandler, IItemHandlerModifiable, ItemHandlerHelper}
-import net.minecraftforge.common.util.Constants
 
 class ItemHandler(protected var stacks: List[ItemStack]) extends IItemHandler with IItemHandlerModifiable
-  with INBTSerializable[CompoundNBT] {
+  with INBTSerializable[CompoundTag] {
 
   override def getSlots: Int = stacks.length
 
@@ -94,6 +91,18 @@ class ItemHandler(protected var stacks: List[ItemStack]) extends IItemHandler wi
     }
   }
 
+  def popStack(slot: Int): ItemStack = {
+    validateSlotIndex(slot)
+
+    if (stacks(slot).isEmpty) {
+      ItemStack.EMPTY
+    } else {
+      val ret = getStackInSlot(slot)
+      this.stacks = stacks.updated(slot, ItemStack.EMPTY)
+
+      ret
+    }
+  }
 
   override def extractItem(slot: Int, amount: Int, simulate: Boolean): ItemStack = extractItemI(slot, amount)(simulate)
 
@@ -135,31 +144,31 @@ class ItemHandler(protected var stacks: List[ItemStack]) extends IItemHandler wi
 
   def isItemValid(slot: Int, stack: ItemStack): Boolean = true
 
-  def serializeNBT: CompoundNBT = {
-    val items = new ListNBT()
+  def serializeNBT: CompoundTag = {
+    val items = new ListTag()
 
     stacks.zipWithIndex.foreach { case (stack, i) =>
-      val tag = new CompoundNBT()
+      val tag = new CompoundTag()
       tag.putInt("Slot", i)
       stack.save(tag)
       items.add(tag)
     }
 
-    val nbt = new CompoundNBT()
+    val nbt = new CompoundTag()
     nbt.put("Items", items)
     nbt.putInt("Size", stacks.size)
     nbt
   }
 
-  def deserializeNBT(nbt: CompoundNBT): Unit = {
-    if (nbt.contains("Size", Constants.NBT.TAG_INT)) {
+  def deserializeNBT(nbt: CompoundTag): Unit = {
+    if (nbt.contains("Size", 3)) {
       stacks = List.empty
       (0 to nbt.getInt("Size")).foreach { _ =>
         stacks = stacks :+ ItemStack.EMPTY
       }
     }
 
-    val tagList = nbt.getList("Items", Constants.NBT.TAG_COMPOUND)
+    val tagList = nbt.getList("Items", 10)
 
     (0 until tagList.size).foreach { i =>
       val itemTags = tagList.getCompound(i)
@@ -190,7 +199,7 @@ class ItemHandler(protected var stacks: List[ItemStack]) extends IItemHandler wi
 
   def clear(): Unit = stacks = List.fill(stacks.length)(ItemStack.EMPTY)
 
-  def asInventory: IInventory = WrappedInventory(this)
+//  def asInventory: IInventory = WrappedInventory(this)
 }
 
 object ItemHandler {

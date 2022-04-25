@@ -1,30 +1,26 @@
 package com.github.jtrim777.scalacore.screens
 
-import com.mojang.blaze3d.matrix.MatrixStack
 import com.mojang.blaze3d.platform.GlStateManager
-import com.github.jtrim777.scalacore.utils.StrExt
-import net.minecraft.client.gui.AbstractGui
-import net.minecraft.client.renderer.Tessellator
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.inventory.container.PlayerContainer
-import net.minecraft.util.ResourceLocation
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.renderer.texture.{TextureAtlas, TextureAtlasSprite}
+import net.minecraft.resources.ResourceLocation
 
-class GraphicsContext(screen: Screen[_, _], left: Int, top: Int, matrix: MatrixStack) {
+class GraphicsContext(screen: Screen[_, _, _], left: Int, top: Int, matrix: PoseStack) {
   def drawTexture(dx: Int, dy: Int, sx: Int, sy: Int, width: Int, height: Int): Unit = {
     screen.blit(matrix, dx + left, dy + top, sx, sy, width, height)
   }
 
-  def drawTexture(dx: Int, dy: Int, sx: Int, sy: Int, width: Int, height: Int, zLevel: Int): Unit = {
-    AbstractGui.blit(matrix, dx + left, dy + top, zLevel, sx, sy, width, height, 256, 256)
-  }
+//  def drawTexture(dx: Int, dy: Int, sx: Int, sy: Int, width: Int, height: Int, zLevel: Int): Unit = {
+//    screen.blit(matrix, dx + left, dy + top, zLevel, sx, sy, width, height, 256, 256)
+//  }
 
   def drawTexture(binding: TextureBinding): Unit = {
     drawTexture(binding.destX, binding.destY, binding.sourceX, binding.sourceY, binding.width, binding.height)
   }
-  def drawTexture(binding: TextureBinding, zLevel: Int): Unit = {
-    drawTexture(binding.destX, binding.destY, binding.sourceX, binding.sourceY, binding.width, binding.height, zLevel)
-  }
+//  def drawTexture(binding: TextureBinding, zLevel: Int): Unit = {
+//    drawTexture(binding.destX, binding.destY, binding.sourceX, binding.sourceY, binding.width, binding.height, zLevel)
+//  }
 
   def drawWithCutoff(binding: TextureBinding, drawWidth: Int = -1, drawHeight: Int = -1): Unit = {
     import binding._
@@ -46,11 +42,11 @@ class GraphicsContext(screen: Screen[_, _], left: Int, top: Int, matrix: MatrixS
   }
 
   def getBlockSprite(loc: ResourceLocation): TextureAtlasSprite = {
-    screen.getMinecraft.getTextureAtlas(PlayerContainer.BLOCK_ATLAS)(loc)
+    screen.getMinecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)(loc)
   }
 
   def withBinding(loc: ResourceLocation)(exec: () => Unit): Unit = {
-    screen.getMinecraft.textureManager.bind(loc)
+    RenderSystem.setShaderTexture(0, loc)
 
     exec()
 
@@ -62,11 +58,11 @@ class GraphicsContext(screen: Screen[_, _], left: Int, top: Int, matrix: MatrixS
     val green = (color >> 8 & 0xFF) / 255.0F
     val blue = (color & 0xFF) / 255.0F
 
-    GlStateManager._color4f(red, green, blue, 1)
+    RenderSystem.setShaderColor(red, green, blue, 1)
   }
 
   def resetGLColor(): Unit = {
-    GlStateManager._color4f(1, 1, 1, 1.0F)
+    RenderSystem.setShaderColor(1,1,1,1)
   }
 
   def withColor(color: Int)(exec: () => Unit): Unit = {
@@ -88,23 +84,23 @@ class GraphicsContext(screen: Screen[_, _], left: Int, top: Int, matrix: MatrixS
    * @param sy  The y value of the texture
    */
   def tesselateSquare(x: Int, y: Int, w: Int, h: Int, sx: Float, sy: Float): Unit = {
-    val tessellator = Tessellator.getInstance()
-    val buffer = tessellator.getBuilder
-
-    val tx = x + left
-    val ty = y + top
-
-    val uMin = sx / GraphicsContext.TesselFactor
-    val uMax = (sx+w) / GraphicsContext.TesselFactor
-    val vMin = sy / GraphicsContext.TesselFactor
-    val vMax = (sy+h) / GraphicsContext.TesselFactor
-
-    buffer.begin(7, DefaultVertexFormats.POSITION_TEX)
-    buffer.vertex(tx, ty + h, 100).uv(uMin, vMax).endVertex()
-    buffer.vertex(tx + w, ty + h, 100).uv(uMax, vMax).endVertex()
-    buffer.vertex(tx + w, ty, 100).uv(uMax, vMin).endVertex()
-    buffer.vertex(tx, ty, 100).uv(uMin, vMin).endVertex()
-    tessellator.`end`()
+//    val tessellator = Tessellator.getInstance()
+//    val buffer = tessellator.getBuilder
+//
+//    val tx = x + left
+//    val ty = y + top
+//
+//    val uMin = sx / GraphicsContext.TesselFactor
+//    val uMax = (sx+w) / GraphicsContext.TesselFactor
+//    val vMin = sy / GraphicsContext.TesselFactor
+//    val vMax = (sy+h) / GraphicsContext.TesselFactor
+//
+//    buffer.begin(7, DefaultVertexFormats.POSITION_TEX)
+//    buffer.vertex(tx, ty + h, 100).uv(uMin, vMax).endVertex()
+//    buffer.vertex(tx + w, ty + h, 100).uv(uMax, vMax).endVertex()
+//    buffer.vertex(tx + w, ty, 100).uv(uMax, vMin).endVertex()
+//    buffer.vertex(tx, ty, 100).uv(uMin, vMin).endVertex()
+//    tessellator.`end`()
   }
 
   /**

@@ -1,7 +1,7 @@
 
-# Use the Scoreg 3rd Party Scala Mod Loader
-modLoader = "scorge"
-loaderVersion = "[3.1,)"
+# Use the Scorge 3rd Party Scala Mod Loader
+modLoader = "kotori_scala"
+loaderVersion = "[2.13.3,2.14.0)"
 
 license="All rights reserved"
 
@@ -10,7 +10,7 @@ license="All rights reserved"
     # The modid of the mod
     modId="scalacore" #mandatory
     # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-    version="0.1.1" #mod
+    version="0.2.1" #mod
     # A display name for the mod
     displayName="Scala Core" #mandatory
     # The description text for the mod (multi line!) (#mandatory)
@@ -26,7 +26,7 @@ license="All rights reserved"
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[36,)" #mandatory
+    versionRange="[39,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -36,6 +36,6 @@ license="All rights reserved"
 [[dependencies.scalacore]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.5]"
+    versionRange="[1.18.1]"
     ordering="NONE"
     side="BOTH"

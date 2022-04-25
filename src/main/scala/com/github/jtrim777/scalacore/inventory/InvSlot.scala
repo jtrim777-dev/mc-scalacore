@@ -1,6 +1,6 @@
 package com.github.jtrim777.scalacore.inventory
 
-import net.minecraft.item.Item
+import net.minecraft.world.item.Item
 import net.minecraftforge.items.{IItemHandler, SlotItemHandler}
 
 class InvSlot(handler: IItemHandler, pos: Int, x: Int, y: Int, val kind: InvSlot.Type) extends SlotItemHandler(handler,pos,x,y) {

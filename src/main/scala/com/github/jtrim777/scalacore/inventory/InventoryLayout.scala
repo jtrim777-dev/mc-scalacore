@@ -1,7 +1,7 @@
 package com.github.jtrim777.scalacore.inventory
 
 import com.github.jtrim777.scalacore.capabilities.ItemHandler
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 class InventoryLayout private(val slots: List[InvSlot.Unresolved], val aliases: Map[String, collection.immutable.Range]) {
   def slot(i: Int)(implicit handler: ItemHandler): InvSlot = slots(i)(handler)

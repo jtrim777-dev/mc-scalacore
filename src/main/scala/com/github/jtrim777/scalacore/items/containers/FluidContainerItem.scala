@@ -5,21 +5,20 @@ import scala.jdk.OptionConverters._
 import scala.util.Try
 
 import com.github.jtrim777.scalacore.capabilities.EmptyFluidItemHandler
-import net.minecraft.client.util.ITooltipFlag
-import net.minecraft.item.Item.Properties
-import net.minecraft.item.{Item, ItemStack}
-import net.minecraft.nbt.CompoundNBT
-import net.minecraft.util.text.{ITextComponent, StringTextComponent, TextFormatting, TranslationTextComponent}
-import net.minecraft.world.World
-import net.minecraftforge.common.capabilities.ICapabilityProvider
-import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler, IFluidHandlerItem}
 import com.github.jtrim777.scalacore.utils._
-import net.minecraft.util.Util
+import net.minecraft.ChatFormatting
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.world.item.Item.Properties
+import net.minecraft.world.item.{Item, ItemStack, TooltipFlag}
+import net.minecraft.world.level.Level
+import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack
+import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandlerItem}
 
 object FluidContainerItem {
   def make(capacity: Int, props: Properties, baseID: String,
-           nameFormat: (ITextComponent, ITextComponent) => ITextComponent)(implicit modid: String): List[Item] = {
+           nameFormat: (Component, Component) => Component)(implicit modid: String): List[Item] = {
     val empty = new Empty(capacity, props)
     val full = new Full(capacity, props, nameFormat)
 
@@ -32,37 +31,37 @@ object FluidContainerItem {
   class Empty(val capacity: Int, props: Properties) extends Item(props) {
     var fullItem: Full = null
 
-    override def initCapabilities(stack: ItemStack, nbt: CompoundNBT): ICapabilityProvider = {
+    override def initCapabilities(stack: ItemStack, nbt: CompoundTag): ICapabilityProvider = {
       new EmptyFluidItemHandler(capacity, stack, fullItem)
     }
   }
 
-  class Full(val capacity: Int, props: Properties, nameFormat: (ITextComponent, ITextComponent) => ITextComponent) extends Item(props.stacksTo(1)) {
+  class Full(val capacity: Int, props: Properties, nameFormat: (Component, Component) => Component) extends Item(props.stacksTo(1)) {
     var emptyItem: Empty = null
 
-    override def appendHoverText(stack: ItemStack, world : World, text: util.List[ITextComponent], usage: ITooltipFlag): Unit = {
+    override def appendHoverText(stack: ItemStack, world: Level, text: util.List[Component], usage: TooltipFlag): Unit = {
       super.appendHoverText(stack, world, text, usage)
 
       withFluidHandler(stack) { handler =>
         val fluid = handler.getFluid
         if (fluid.isEmpty) {
-          text.add(new TranslationTextComponent("item.scalacore.container.empty").withStyle(TextFormatting.GRAY))
+          text.add(new TranslatableComponent("item.scalacore.container.empty").withStyle(ChatFormatting.GRAY))
         } else {
-          text.add(new StringTextComponent(s"${fluid.getAmount} mB"))
+          text.add(new TextComponent(s"${fluid.getAmount} mB"))
         }
       }
     }
 
-    override def getName(stack: ItemStack): ITextComponent = {
+    override def getName(stack: ItemStack): Component = {
       val baseName = super.getName(stack)
 
       withFluidHandler(stack) { handler =>
-        val fnm = new TranslationTextComponent(handler.getFluid.getTranslationKey)
+        val fnm = new TranslatableComponent(handler.getFluid.getTranslationKey)
         nameFormat(baseName, fnm)
       }.getOrElse(baseName)
     }
 
-    override def initCapabilities(stack: ItemStack, nbt: CompoundNBT): ICapabilityProvider = {
+    override def initCapabilities(stack: ItemStack, nbt: CompoundTag): ICapabilityProvider = {
       new FluidHandlerItemStack.SwapEmpty(stack, new ItemStack(emptyItem, 1), capacity)
     }
   }
