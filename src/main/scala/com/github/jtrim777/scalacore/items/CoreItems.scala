@@ -15,9 +15,9 @@ object CoreItems extends ComponentManager[Item](ScalaCore.MODID, ForgeRegistries
   val bucket: Option[UniversalBucketItem] = entry("universal_bucket", new UniversalBucketItem)
     .map(_.asInstanceOf[UniversalBucketItem]).toScala
 
-  private val tinCansI = {
+  private lazy val tinCansI = {
     FluidContainerItem.make(1000, new Properties().tab(CreativeModeTab.TAB_TOOLS), "tin_can",
-      (base, fluid) => base.asInstanceOf[TextComponent].append(" of ").append(fluid))(modid)
+      (base, fluid) => base.append(" of ").append(fluid))(modid)
   }
   val tinCan: Option[FluidContainerItem.Full] = entry("tin_can", tinCansI(1))
     .map(_.asInstanceOf[FluidContainerItem.Full]).toScala

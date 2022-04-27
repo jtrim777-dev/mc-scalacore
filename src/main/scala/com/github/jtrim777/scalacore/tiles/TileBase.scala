@@ -63,10 +63,10 @@ abstract class TileBase(invSize: Int, kind: BlockEntityType[_], nameKey: String)
    * primary inventory
    * @param tag The tag to add data to
    */
-  override def save(tag: CompoundTag): CompoundTag = {
+  override def saveAdditional(tag: CompoundTag): Unit = {
     tag.put("primary_inventory", inventory.serializeNBT)
 
-    super.save(tag)
+    super.saveAdditional(tag)
   }
 
   /**

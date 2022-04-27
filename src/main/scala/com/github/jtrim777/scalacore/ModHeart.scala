@@ -36,7 +36,7 @@ trait ModHeart {
   }
 
   @SubscribeEvent
-  private def commonSetupI(event: FMLCommonSetupEvent): Unit = {
+  def commonSetupI(event: FMLCommonSetupEvent): Unit = {
     proxy.executeClient(getContent.registerScreens)
     proxy.init()
     commonSetup(event)

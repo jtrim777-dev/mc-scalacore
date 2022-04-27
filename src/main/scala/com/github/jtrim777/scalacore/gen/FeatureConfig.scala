@@ -3,8 +3,11 @@ package com.github.jtrim777.scalacore.gen
 import java.util
 import scala.jdk.CollectionConverters.IterableHasAsJava
 
+import net.minecraft.core.Holder
+import net.minecraft.data.worldgen.placement.PlacementUtils
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
 import net.minecraft.world.level.levelgen.feature.{ConfiguredFeature, Feature}
 import net.minecraft.world.level.levelgen.placement._
@@ -13,31 +16,32 @@ import net.minecraft.world.level.levelgen.{GenerationStep, VerticalAnchor}
 
 trait FeatureConfig {
   val stage: GenerationStep.Decoration
-  def feature: ConfiguredFeature[_,_]
-  def placedFeature: PlacedFeature
   def appliesToBiome(name:String): Boolean
+
+  def feature: Holder[PlacedFeature]
 }
 
-case class OreConfig(oreReplace: List[(RuleTest, Block)], count: Int, size: Int, minHeight: Int, maxHeight: Int,
-                     biomes: List[Biome] = List.empty) extends FeatureConfig {
+case class OreConfig(name:String, oreReplace: List[(RuleTest, BlockState)], count: Int, size: Int,
+                     minHeight: Int, maxHeight: Int, biomes: List[Biome] = List.empty) extends FeatureConfig {
   override val stage: GenerationStep.Decoration = GenerationStep.Decoration.UNDERGROUND_ORES
 
-  lazy val feature: ConfiguredFeature[_,_] = {
-    val targets = oreReplace.map { case (filler, ore) =>
-      OreConfiguration.target(filler, ore.defaultBlockState())
+  lazy val feature: Holder[PlacedFeature] = {
+    val targets = oreReplace.map { case (test, rep) =>
+      OreConfiguration.target(test, rep)
     }.asJavaCollection
 
-    Feature.ORE
-      .configured(new OreConfiguration(new util.ArrayList[OreConfiguration.TargetBlockState](targets), size))
-  }
+    val config = new OreConfiguration(new util.ArrayList(targets), size)
 
-  lazy val placedFeature: PlacedFeature = {
-    feature.placed(
+    val configured = new ConfiguredFeature(Feature.ORE, config)
+
+    val placements = List(
       InSquarePlacement.spread(),
       BiomeFilter.biome(),
       CountPlacement.of(count),
       HeightRangePlacement.triangle(VerticalAnchor.aboveBottom(minHeight), VerticalAnchor.aboveBottom(maxHeight))
     )
+
+    PlacementUtils.register(name, Holder.direct(configured), placements:_*)
   }
 
   override def appliesToBiome(name: String): Boolean =

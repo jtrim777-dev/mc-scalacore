@@ -3,6 +3,7 @@ package com.github.jtrim777.scalacore.utils
 import scala.reflect.ClassTag
 
 import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.item.{BlockItem, CreativeModeTab, Item}
@@ -22,7 +23,7 @@ sealed trait ContentRegistrar[T <: IForgeRegistryEntry[T]] {
 abstract class ComponentManager[T <: IForgeRegistryEntry[T]](val modid: String, registry: IForgeRegistry[T]) extends ContentRegistrar[T] {
   protected val entries: DeferredRegister[T] = DeferredRegister.create(registry, modid)
 
-  def entry(name: String, value: T): RegistryObject[T] = {
+  def entry(name: String, value: => T): RegistryObject[T] = {
     entries.register(name, () => value)
   }
 
@@ -35,8 +36,8 @@ abstract class ComponentManager[T <: IForgeRegistryEntry[T]](val modid: String, 
 
 abstract class CustomComponentManager[T <: IForgeRegistryEntry[T] : ClassTag](val modid: String, name: String) extends ContentRegistrar[T] {
   private val clazz = implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]
-  protected val entries: DeferredRegister[T] = DeferredRegister.create[T](clazz, modid)
-  entries.makeRegistry(name, () => new RegistryBuilder[T]()
+  protected val entries: DeferredRegister[T] = DeferredRegister.create[T](new ResourceLocation(modid, name), modid)
+  entries.makeRegistry(clazz, () => new RegistryBuilder[T]()
     .setType(clazz)
     .setName(name.rloc(modid)))
 
@@ -82,12 +83,11 @@ object ComponentManager {
 //        .setRegistryName("minecraft", block.getRegistryName.getPath)
   }
 
-  implicit class TileHelper(val tcm: ComponentManager[BlockEntityType[_]]) {
-    def tileEntity[T <: BlockEntity](name: String, tileMaker: (BlockPos, BlockState) => T, parentBlocks: Block*): BlockEntityType[_ <: BlockEntity] = {
-      val t = BlockEntityType.Builder.of((pos, state) => tileMaker(pos, state), parentBlocks:_*).build(null)
-      t.setRegistryName(name)
-      tcm.entry(name, t)
-      t
+  implicit class TileHelper(val tcm: ComponentManager[BlockEntityType[_ <: BlockEntity]]) {
+    def tileEntity[T <: BlockEntity](name: String, tileMaker: (BlockPos, BlockState) => T, parentBlocks: Block*): RegistryObject[BlockEntityType[_ <: BlockEntity]] = {
+      val t = BlockEntityType.Builder.of((pos, state) => tileMaker(pos, state), parentBlocks:_*)
+
+      tcm.entry(name, t.build(null))
     }
   }
 }

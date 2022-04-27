@@ -8,7 +8,7 @@ import com.github.jtrim777.scalacore.capabilities.EmptyFluidItemHandler
 import com.github.jtrim777.scalacore.utils._
 import net.minecraft.ChatFormatting
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.network.chat.{BaseComponent, Component, TextComponent, TranslatableComponent}
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.item.{Item, ItemStack, TooltipFlag}
 import net.minecraft.world.level.Level
@@ -18,14 +18,14 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandl
 
 object FluidContainerItem {
   def make(capacity: Int, props: Properties, baseID: String,
-           nameFormat: (Component, Component) => Component)(implicit modid: String): List[Item] = {
+           nameFormat: (BaseComponent, BaseComponent) => Component)(implicit modid: String): List[Item] = {
     val empty = new Empty(capacity, props)
     val full = new Full(capacity, props, nameFormat)
 
     empty.fullItem = full
     full.emptyItem = empty
 
-    List(empty.setRegistryName(s"${baseID}_empty".rloc), full.setRegistryName(baseID.rloc))
+    List(empty, full)
   }
 
   class Empty(val capacity: Int, props: Properties) extends Item(props) {
@@ -36,7 +36,7 @@ object FluidContainerItem {
     }
   }
 
-  class Full(val capacity: Int, props: Properties, nameFormat: (Component, Component) => Component) extends Item(props.stacksTo(1)) {
+  class Full(val capacity: Int, props: Properties, nameFormat: (BaseComponent, BaseComponent) => Component) extends Item(props.stacksTo(1)) {
     var emptyItem: Empty = null
 
     override def appendHoverText(stack: ItemStack, world: Level, text: util.List[Component], usage: TooltipFlag): Unit = {
@@ -53,7 +53,7 @@ object FluidContainerItem {
     }
 
     override def getName(stack: ItemStack): Component = {
-      val baseName = super.getName(stack)
+      val baseName = super.getName(stack).asInstanceOf[BaseComponent]
 
       withFluidHandler(stack) { handler =>
         val fnm = new TranslatableComponent(handler.getFluid.getTranslationKey)
