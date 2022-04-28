@@ -3,18 +3,14 @@ package com.github.jtrim777.scalacore.items
 import scala.jdk.OptionConverters.RichOptional
 
 import com.github.jtrim777.scalacore.ScalaCore
-import com.github.jtrim777.scalacore.items.containers.{FluidContainerItem, UniversalBucketItem}
+import com.github.jtrim777.scalacore.items.containers.FluidContainerItem
 import com.github.jtrim777.scalacore.utils.ComponentManager
-import net.minecraft.network.chat.TextComponent
-import net.minecraft.world.item.{CreativeModeTab, Item}
 import net.minecraft.world.item.Item.Properties
+import net.minecraft.world.item.{CreativeModeTab, Item}
 import net.minecraftforge.registries.ForgeRegistries
 
 
 object CoreItems extends ComponentManager[Item](ScalaCore.MODID, ForgeRegistries.ITEMS) {
-  val bucket: Option[UniversalBucketItem] = entry("universal_bucket", new UniversalBucketItem)
-    .map(_.asInstanceOf[UniversalBucketItem]).toScala
-
   private lazy val tinCansI = {
     FluidContainerItem.make(1000, new Properties().tab(CreativeModeTab.TAB_TOOLS), "tin_can",
       (base, fluid) => base.append(" of ").append(fluid))(modid)

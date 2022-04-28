@@ -1,0 +1,8 @@
+{
+  "loader": "forge:bucket",
+  "fluid": "water",
+  "textures": {
+    "base": "scalacore:item/tin_can",
+    "fluid": "scalacore:item/tin_can_overlay"
+  }
+}

@@ -2,6 +2,7 @@ package com.github.jtrim777.scalacore
 
 import com.github.jtrim777.scalacore.setup.{ClientProxy, ModProxy, ServerProxy}
 import com.github.jtrim777.scalacore.utils.ContentManager
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.eventbus.api.{IEventBus, SubscribeEvent}
 import net.minecraftforge.fml.DistExecutor
 import net.minecraftforge.fml.event.lifecycle.{FMLCommonSetupEvent, FMLDedicatedServerSetupEvent}
@@ -33,6 +34,9 @@ trait ModHeart {
 
     log.info("Registering content manager to dump registries")
     getContent.register(bus)
+
+    MinecraftForge.EVENT_BUS.register(proxy)
+    FMLJavaModLoadingContext.get().getModEventBus.register(proxy)
   }
 
   @SubscribeEvent

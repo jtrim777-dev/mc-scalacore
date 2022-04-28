@@ -1,3 +1,5 @@
 {
-
+  "item.scalacore.container.empty": "Empty",
+  "item.scalacore.tin_can": "Tin Can",
+  "item.scalacore.tin_can_empty": "Tin Can"
 }

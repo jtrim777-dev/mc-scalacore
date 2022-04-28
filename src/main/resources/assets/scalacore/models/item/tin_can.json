@@ -1,0 +1,6 @@
+{
+  "loader": "scalacore:fluid_container",
+  "gui_light": "front",
+  "empty": "scalacore:item/tin_can_empty",
+  "filled": "scalacore:item/tin_can_filled"
+}

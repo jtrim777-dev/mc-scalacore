@@ -14,13 +14,14 @@ object ScalaCore extends ModHeart {
 
   override def getModID: String = ScalaCore.MODID
 
-  override def getClientProxy: ClientProxy = CoreClientProxy()
+  override def getClientProxy: ClientProxy = CoreClientProxy(log)
 
-  override def getServerProxy: ServerProxy = CoreServerProxy()
+  override def getServerProxy: ServerProxy = CoreServerProxy(log)
 
   override protected def initialize(bus: IEventBus): Unit = {
     super.initialize(bus)
     ForgeMod.enableMilkFluid()
+
   }
 
   override def getContent: ContentManager = CoreContent
