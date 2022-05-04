@@ -10,7 +10,7 @@ import net.minecraftforge.fml.event.lifecycle.{FMLCommonSetupEvent, FMLDedicated
 @Mod(ScalaCore.MODID)
 object ScalaCore extends ModHeart {
   final val MODID = "scalacore"
-  final val Version: String = "0.2.1"
+  final val Version: String = "0.2.2"
 
   override def getModID: String = ScalaCore.MODID
 
