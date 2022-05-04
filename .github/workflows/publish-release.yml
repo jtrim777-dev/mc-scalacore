@@ -43,7 +43,7 @@ jobs:
           author_name: GitHub Actions
           author_email: Jtrim777
           message: 'Update versioning info'
-          branch: mcv1.18.1
+          branch: mcv1.18.2
           pull: 'NO-PULL'
           push: true
           tag: 'v${{ env.NEW_VERSION }} --force'
