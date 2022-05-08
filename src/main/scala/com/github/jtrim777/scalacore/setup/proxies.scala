@@ -2,22 +2,22 @@ package com.github.jtrim777.scalacore.setup
 
 import com.github.jtrim777.scalacore.ScalaCore
 import com.github.jtrim777.scalacore.render.FluidContainerModel
+import com.github.jtrim777.scalacore.utils.ContentManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.model.ModelResourceLocation
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
-import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.event.ModelRegistryEvent
 import net.minecraftforge.client.model.{ForgeModelBakery, ModelLoaderRegistry}
 import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.DistExecutor
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
+import net.minecraftforge.fml.event.lifecycle.{FMLClientSetupEvent, FMLCommonSetupEvent, FMLDedicatedServerSetupEvent}
 import net.minecraftforge.fml.loading.FMLEnvironment
 import org.apache.logging.log4j.Logger
 
 sealed trait ModProxy {
-  def init(): Unit
+  val content: ContentManager
+  def init(event: FMLCommonSetupEvent): Unit
 
   def getClientWorld: Level
 
@@ -42,6 +42,8 @@ trait ClientProxy extends ModProxy {
   override def inClient[T](f: () => T): Option[T] = Some(f())
 
   override def inServer[T](f: () => T): Option[T] = None
+
+  def clientInit(event: FMLClientSetupEvent): Unit
 }
 
 trait ServerProxy extends ModProxy {
@@ -58,11 +60,17 @@ trait ServerProxy extends ModProxy {
   override def inClient[T](f: () => T): Option[T] = None
 
   override def inServer[T](f: () => T): Option[T] = Some(f())
+
+  def serverInit(event: FMLDedicatedServerSetupEvent): Unit
 }
 
-private[scalacore] case class CoreClientProxy(log: Logger) extends ClientProxy {
-  override def init(): Unit = {
+private[scalacore] case class CoreClientProxy(content: ContentManager, log: Logger) extends ClientProxy {
+  override def init(event: FMLCommonSetupEvent): Unit = {
+    content.registerScreens()
   }
+
+
+  override def clientInit(event: FMLClientSetupEvent): Unit = {}
 
   @SubscribeEvent
   def registerModelLoaders(event: ModelRegistryEvent): Unit = {
@@ -78,8 +86,10 @@ private[scalacore] case class CoreClientProxy(log: Logger) extends ClientProxy {
   }
 }
 
-private[scalacore] case class CoreServerProxy(log: Logger) extends ServerProxy {
-  override def init(): Unit = {
+private[scalacore] case class CoreServerProxy(content: ContentManager, log: Logger) extends ServerProxy {
+  override def init(event: FMLCommonSetupEvent): Unit = {
     Minecraft.getInstance().level.getRecipeManager
   }
+
+  override def serverInit(event: FMLDedicatedServerSetupEvent): Unit = {}
 }
