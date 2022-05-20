@@ -27,11 +27,11 @@ abstract class ComponentManager[T <: IForgeRegistryEntry[T]](val modid: String, 
     entries.register(name, () => value)
   }
 
-//  def entry(loc: ResourceLocation, value: T): T =
-//    value.setRegistryName(loc)
-//
-//  def entryOverride(name: String, replacement: T): T =
-//    replacement.setRegistryName(new ResourceLocation("minecraft", name))
+  //  def entry(loc: ResourceLocation, value: T): T =
+  //    value.setRegistryName(loc)
+  //
+  //  def entryOverride(name: String, replacement: T): T =
+  //    replacement.setRegistryName(new ResourceLocation("minecraft", name))
 }
 
 abstract class CustomComponentManager[T <: IForgeRegistryEntry[T] : ClassTag](val modid: String, name: String) extends ContentRegistrar[T] {
@@ -78,16 +78,20 @@ object ComponentManager {
     def seed(name: String, plant: Block): RegistryObject[Item] =
       icm.entry(name, new BlockItem(plant, new Properties().tab(CreativeModeTab.TAB_MISC)))
 
-//    private def overrideBlockItem(block: Block, group: ItemGroup): Item =
-//      new BlockItem(block, new Item.Properties().tab(group))
-//        .setRegistryName("minecraft", block.getRegistryName.getPath)
+    //    private def overrideBlockItem(block: Block, group: ItemGroup): Item =
+    //      new BlockItem(block, new Item.Properties().tab(group))
+    //        .setRegistryName("minecraft", block.getRegistryName.getPath)
   }
 
+  /*
   implicit class TileHelper(val tcm: ComponentManager[BlockEntityType[_ <: BlockEntity]]) {
-    def tileEntity[T <: BlockEntity](name: String, tileMaker: (BlockPos, BlockState) => T, parentBlocks: Block*): RegistryObject[BlockEntityType[_ <: BlockEntity]] = {
-      val t = BlockEntityType.Builder.of((pos, state) => tileMaker(pos, state), parentBlocks:_*)
-
-      tcm.entry(name, t.build(null))
+    def tileEntity[T <: BlockEntity](name: String, tileMaker: (BlockPos, BlockState) => T, parentBlocks: (=> Block)*): RegistryObject[BlockEntityType[_ <: BlockEntity]] = {
+      tcm.entry(name,
+        BlockEntityType.Builder.of((pos, state) =>
+          tileMaker(pos, state), parentBlocks: _*
+        ).build(null)
+      )
     }
   }
+  */
 }
