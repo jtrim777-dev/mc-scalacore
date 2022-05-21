@@ -16,9 +16,9 @@ abstract class MenuBase[D <: MenuDataProvider](kind: MenuType[_], val blockType:
   extends AbstractContainerMenu(kind, containerID) {
 
   val playerInventory: IItemHandler = new InvWrapper(playerInv)
-  val playerInvStart: (Int, Int)
+  def playerInvStart: (Int, Int)
 
-  {
+  def initialize(): Unit = {
     layoutSlots(data.inventory)
 
     layoutPlayerSlots()
@@ -26,21 +26,21 @@ abstract class MenuBase[D <: MenuDataProvider](kind: MenuType[_], val blockType:
 
   protected def layoutSlots(handler: ItemHandler): Unit
 
-  private def layoutPlayerSlots(): Unit = {
-    val (sx, sy) = playerInvStart
+  protected def layoutPlayerSlots(): Unit = {
+    val (sx, sy) = (playerInvStart._1, playerInvStart._2)
 
-    sx.until(sx + (18*8),18).zipWithIndex.foreach { case (x, i) =>
+    sx.until(sx + (18*9),18).zipWithIndex.foreach { case (x, i) =>
       addSlot(new InvSlot(playerInventory, i, x, sy + (18*3) + 4, InvSlot.Generic))
     }
 
     val ys = sy.until(sy + (18*3), 18)
-    val xs = sx.until(sx + (18*8), 18)
+    val xs = sx.until(sx + (18*9), 18)
 
     ys.zipWithIndex.foreach { case (y, j) =>
       val tj = j * xs.length
       xs.zipWithIndex.foreach { case (x, i) =>
         val ti = i + tj
-        addSlot(new InvSlot(playerInventory, ti, x, y, InvSlot.Generic))
+        addSlot(new InvSlot(playerInventory, ti + 9, x, y, InvSlot.Generic))
       }
     }
   }

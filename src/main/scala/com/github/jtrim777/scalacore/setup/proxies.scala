@@ -66,11 +66,15 @@ trait ServerProxy extends ModProxy {
 
 private[scalacore] case class CoreClientProxy(content: ContentManager, log: Logger) extends ClientProxy {
   override def init(event: FMLCommonSetupEvent): Unit = {
-    content.registerScreens()
+
   }
 
 
-  override def clientInit(event: FMLClientSetupEvent): Unit = {}
+  override def clientInit(event: FMLClientSetupEvent): Unit = {
+    event.enqueueWork(new Runnable {
+      override def run(): Unit = content.registerScreens()
+    })
+  }
 
   @SubscribeEvent
   def registerModelLoaders(event: ModelRegistryEvent): Unit = {

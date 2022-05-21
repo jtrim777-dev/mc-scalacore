@@ -3,6 +3,7 @@ package com.github.jtrim777.scalacore.items
 import scala.jdk.OptionConverters.RichOptional
 
 import com.github.jtrim777.scalacore.ScalaCore
+import com.github.jtrim777.scalacore.blocks.CoreBlocks
 import com.github.jtrim777.scalacore.items.containers.FluidContainerItem
 import com.github.jtrim777.scalacore.utils.ComponentManager
 import net.minecraft.world.item.Item.Properties

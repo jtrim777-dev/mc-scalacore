@@ -58,7 +58,7 @@ object ComponentManager {
 
     def material(name: String): RegistryObject[Item] = item(name, CreativeModeTab.TAB_MATERIALS)
 
-    def blockItem(block: Block, group: CreativeModeTab): RegistryObject[Item] = icm.entry(block.getRegistryName.getPath,
+    def blockItem(name: String, block: => Block, group: CreativeModeTab): RegistryObject[Item] = icm.entry(name,
       new BlockItem(block, new Properties().tab(group)))
 
     def food(name: String, hunger: Int, sat: Float, fast: Boolean): RegistryObject[Item] = {
