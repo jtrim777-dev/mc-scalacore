@@ -13,7 +13,7 @@ abstract class GenerationManager {
   def features: List[FeatureConfig] = ores
 
   def registerBiomeFeatures(event: BiomeLoadingEvent): Unit = {
-    println("Registering features for "+event.getName.getPath)
+//    println("Registering features for "+event.getName.getPath)
     event.getName match {
       case location: ModelResourceLocation =>
         val gen = event.getGeneration
