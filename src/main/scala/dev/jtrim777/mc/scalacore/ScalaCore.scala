@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.Mod
 @Mod(ScalaCore.MODID)
 object ScalaCore extends ModHeart {
   final val MODID = "scalacore"
-  final val Version: String = "0.2.7"
+  final val Version: String = "0.2.8"
 
   override lazy val content: ContentManager = CoreContent
 
