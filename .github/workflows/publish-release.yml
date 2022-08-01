@@ -7,6 +7,7 @@ on:
 jobs:
   publish-release:
     runs-on: ubuntu-latest
+    environment: deployment
 
     steps:
       - name: Checkout latest code
@@ -48,14 +49,13 @@ jobs:
           push: true
           tag: 'v${{ env.NEW_VERSION }} --force'
 
-
       - name: Publish artifact
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BAZELDIST_USERNAME: ${{ secrets.REPO_USER }}
+          BAZELDIST_PASSWORD: ${{ secrets.REPO_PASS }}
 
         # The GITHUB_REF tag comes in the format 'refs/tags/xxx'.
         # So if we split on '/' and take the 3rd value, we can get the release name.
         run: |
           echo "New version: ${NEW_VERSION}"
-          echo "Github username: ${GITHUB_ACTOR}"
           ./gradlew -Pversion=${NEW_VERSION} publish

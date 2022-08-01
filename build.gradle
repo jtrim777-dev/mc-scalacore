@@ -20,8 +20,8 @@ file('build.properties').withReader {
 }
 
 version = "${config.mc_version}-${config.mod_version}"
-group = 'com.github.jtrim777' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'mc-scalacore'
+group = 'dev.jtrim777.mc' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'scalacore'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17) // Mojang ships Java 8 to end users, so your mod should target Java 8.
 
@@ -153,12 +153,12 @@ publishing {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Jtrim777/mc-scalacore")
+            name = "Jtrim777-repository"
+            url = uri("https://maven.jtrim777.dev/releases")
 
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("BAZELDIST_USERNAME")
+                password = System.getenv("BAZELDIST_PASSWORD")
             }
         }
     }

@@ -17,7 +17,7 @@ license="All rights reserved"
     description='''
         Basis for TheSilverKing7's Scala Mods
         '''
-    entryClass="com.github.jtrim777.scalacore.ScalaCore"
+    entryClass="dev.jtrim777.mc.scalacore.ScalaCore"
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.scalacore]] #optional
