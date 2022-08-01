@@ -145,6 +145,7 @@ jar {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId 'scalacore'
             artifact jar
         }
     }
